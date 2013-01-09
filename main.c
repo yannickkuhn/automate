@@ -31,6 +31,7 @@ int main(void) {
 				printf("sauvegarde dans le fichier\n");
 				break;
 			case 3:
+				// une autre modif
 				printf("charger dans le fichier\n");
 				break;
 			case 4:
@@ -50,10 +51,6 @@ int main(void) {
 				break;
 		};
 		fflush(stdin);
-		// un autre test
-		// un autres test 2
-		// test 3
-		// test 4
-		// test un deux
+		// une modif
 	};
 }
