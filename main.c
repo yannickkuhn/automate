@@ -51,5 +51,6 @@ int main(void) {
 		};
 		fflush(stdin);
 		// un autre test
+		// un autres test 2
 	};
 }
