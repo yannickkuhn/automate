@@ -1,8 +1,9 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #define CMAX 3	// valeurs de types possibles d'une cellule
 #define H 20			// taille de la map : largeur
 #define V 20			// taille de la map : hauteur
 #define TMAX 30	// taille de la dimension du tableau des cellules
+// modif
 
 // voici les sources pour l'automate cellulaire, écrits par Yannick et Julien
 
