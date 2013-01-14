@@ -83,7 +83,7 @@ void affichageParamVoiture(T_VOIT vehicule) {
 
 int test(T_VOIT *vehicule)
 {
- if((vehicule->pos.y>0)&&(vehicule->pos.y<300))
+ if((vehicule2->pos.y>0)&&(vehicule->pos.y<300))
  {
      return 1;
  }
