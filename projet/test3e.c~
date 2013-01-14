@@ -13,7 +13,6 @@
 // - amelioration (julien) : ajout du train
 // - amelioration (julien) : création et mise en place de la map d'affichage
 
-
 typedef struct voiture {
 	char etat;
 	SDL_Rect pos;
