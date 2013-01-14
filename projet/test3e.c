@@ -47,10 +47,14 @@ void Afficher(SDL_Surface* screen,SDL_Surface* tileset,char** table,int nombre_b
 
 }
 
+
+
+
 Uint32 affiche(Uint32 intervalle, void *parametre) {			// code à améliorer : il faudrait faire une fonction affichent ... pour toutes les voitures
 	T_VOIT *voit;
 	voit = parametre;
-	voit->pos.x = voit->pos.x+voit->vitesse;
+	if(voit->etat==0)
+    voit->pos.x = voit->pos.x+voit->vitesse;
 	if(voit->pos.x > 850)
 		voit->pos.x = -50;
 	return intervalle;
@@ -58,23 +62,33 @@ Uint32 affiche(Uint32 intervalle, void *parametre) {			// code à améliorer : i
 Uint32 affiche1(Uint32 intervalle, void *parametre) {			// code à améliorer : il faudrait faire une fonction affichent ... pour toutes les voitures
 	T_VOIT *voit;
 	voit = parametre;
-	voit->pos.y = voit->pos.y+voit->vitesse;
+    voit->pos.y = voit->pos.y+voit->vitesse;
 	if(voit->pos.y > 6000)
 		voit->pos.y = -50;
 	return intervalle;
+
 }
 
 
-void setParamVoiture(T_VOIT *vehicule, int vitesse, int posH, int posV) {
+void setParamVoiture(T_VOIT *vehicule, int vitesse, int posH, int posV,int arret) {
 	vehicule->vitesse = vitesse;
 	vehicule->pos.x = posH;
 	vehicule->pos.y = posV;
+	vehicule->etat = arret;
 }
 
 void affichageParamVoiture(T_VOIT vehicule) {
 	printf("\nVoici les caractéristiques de celui ci : position : %d %d, vitesse : %d\n",vehicule.pos.x, vehicule.pos.y, vehicule.vitesse);
 }
 
+int test(T_VOIT *vehicule)
+{
+ if((vehicule->pos.y>0)&&(vehicule->pos.y<300))
+ {
+     return 1;
+ }
+     return 0;
+}
 
 
 int main(int argc, char *argv[])
@@ -85,16 +99,17 @@ int main(int argc, char *argv[])
 	SDL_Event event;
 	T_VOIT car[SIZE];
 	int continuer;
-
+	int res;
+	int arret;
 	// Variables du Timer
 	SDL_TimerID idTimer, idTimer2,idTimer3;			// code à améliorer : utiliser 1 seul timer
 	int periode = 10;
 
 	// initialisation
 	continuer = 1;
-	setParamVoiture(&car[0],2,0,230);		// premiere voiture plus rapide
-	setParamVoiture(&car[1],3,0,320);		// une deuxieme plus lente
-	setParamVoiture(&car[2],3,358,0);
+	setParamVoiture(&car[2],3,358,0,arret);
+	setParamVoiture(&car[0],2,0,230,arret);		// premiere voiture plus rapide
+    setParamVoiture(&car[1],3,0,320,arret);
 	affichageParamVoiture(car[0]);
 	affichageParamVoiture(car[1]);
 	affichageParamVoiture(car[2]);			// code à amélioreR
@@ -125,9 +140,22 @@ int main(int argc, char *argv[])
 					break;
 			}
 		}
+        res=test(&car[2]);
+        if(res==0)
+        {
+        arret=1;
+        }
+        else
+        {
+        arret=0;
+	    setParamVoiture(&car[0],2,0,230,arret);		// premiere voiture plus rapide
+        setParamVoiture(&car[1],3,0,320,arret);
+
+        }
+
 		Afficher(ecran,tileset,table,LARGEUR_FENETRE/LARGEUR_TILE,HAUTEUR_FENETRE/HAUTEUR_TILE);
-		SDL_BlitSurface(imgSapin, NULL, ecran, &car[0].pos);			// code à améliorer
-		SDL_BlitSurface(imgSapin, NULL, ecran, &car[1].pos);
+        SDL_BlitSurface(imgSapin, NULL, ecran, &car[0].pos);
+        SDL_BlitSurface(imgSapin, NULL, ecran, &car[1].pos);
 		SDL_BlitSurface(imgtrain, NULL, ecran, &car[2].pos);
 		SDL_Flip(ecran);
 	}
