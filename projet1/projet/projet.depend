@@ -1,6 +1,0 @@
-# depslib dependency file v1.0
-1358189603 source:c:\users\user\desktop\projet\test3e.c
-	<stdlib.h>
-	<stdio.h>
-	<SDL/SDL.h>
-
