@@ -9,9 +9,6 @@
 #define HAUTEUR_FENETRE 576
 
 // Ce code du 13/01/2012 [3] permet d'afficher deux voitures et de les faire bouger ...
-// - amelioration (julien) : remplacer des carrés rouges par des voitures
-// - amelioration (julien) : ajout du train
-// - amelioration (julien) : création et mise en place de la map d'affichage
 
 typedef struct voiture {
 	char etat;
@@ -49,11 +46,62 @@ void Afficher(SDL_Surface* screen,SDL_Surface* tileset,char** table,int nombre_b
 	}
 
 }
+void Afficher1(SDL_Surface* screen,SDL_Surface* tileset,char** table,int nombre_blocs_largeur,int nombre_blocs_hauteur,int arret)
+{
+
+	SDL_Rect Rect_dest;
+	SDL_Rect Rect_source;
+	Rect_source.w = LARGEUR_TILE;
+	Rect_source.h = HAUTEUR_TILE;
+	Rect_dest.x = 2*LARGEUR_TILE;
+	Rect_dest.y = 1*HAUTEUR_TILE;
+	Rect_source.y = 0;
+	      if(arret==0)
+	      {
+			Rect_source.x = ('>'-'0')*LARGEUR_TILE;
+	      }
+	      else
+	      {
+	       	Rect_source.x = ('6'-'0')*LARGEUR_TILE;
+	      }
+
+			SDL_BlitSurface(tileset,&Rect_source,screen,&Rect_dest);
+}
+
 
 Uint32 affiche(Uint32 intervalle, void *parametre) {			// code à améliorer : il faudrait faire une fonction affichent ... pour toutes les voitures
 	T_VOIT *voit;
 	voit = parametre;
-	voit->pos.x = voit->pos.x+voit->vitesse;
+	/*if(voit->etat==0)
+	{
+    voit->pos.x = voit->pos.x+voit->vitesse;
+	}
+    else
+    {
+       if(voit->pos.x <200)
+       {
+        voit->pos.x = voit->pos.x+voit->vitesse-1;
+       }
+
+      else
+         {
+            if((voit->pos.x >=300)&&(voit->pos.x <450))
+            {
+             voit->pos.x = voit->pos.x+voit->vitesse+5;
+            }
+            else
+            {
+             if(voit->pos.x >=450)
+         voit->pos.x = voit->pos.x+voit->vitesse;
+            }
+         }
+
+
+    }*/
+    if(voit->etat == 0)
+        voit->pos.x = voit->pos.x+voit->vitesse;
+
+
 	if(voit->pos.x > 850)
 		voit->pos.x = -50;
 	return intervalle;
@@ -61,23 +109,57 @@ Uint32 affiche(Uint32 intervalle, void *parametre) {			// code à améliorer : i
 Uint32 affiche1(Uint32 intervalle, void *parametre) {			// code à améliorer : il faudrait faire une fonction affichent ... pour toutes les voitures
 	T_VOIT *voit;
 	voit = parametre;
-	voit->pos.y = voit->pos.y+voit->vitesse;
-	if(voit->pos.y > 6000)
-		voit->pos.y = -50;
+    voit->pos.y = voit->pos.y+voit->vitesse;
+	if(voit->pos.y > 800)
+		voit->pos.y = -300;
 	return intervalle;
+
 }
 
 
-void setParamVoiture(T_VOIT *vehicule, int vitesse, int posH, int posV) {
+void setParamVoiture(T_VOIT *vehicule, int vitesse, int posH, int posV,int arret) {
 	vehicule->vitesse = vitesse;
 	vehicule->pos.x = posH;
 	vehicule->pos.y = posV;
+	vehicule->etat = arret;
+}
+
+void load(T_VOIT *vehicule,int arret) {
+
+	vehicule->etat = arret;
 }
 
 void affichageParamVoiture(T_VOIT vehicule) {
 	printf("\nVoici les caractéristiques de celui ci : position : %d %d, vitesse : %d\n",vehicule.pos.x, vehicule.pos.y, vehicule.vitesse);
 }
 
+int test(T_VOIT *vehicule)
+{
+ if((vehicule->pos.y>-300)&&(vehicule->pos.y<500))
+ {
+     return 1;
+ }
+ else
+ {
+      return 0;
+ }
+}
+
+int ControleArretVoitures(T_VOIT *voit, int nbVoit, int arret) {
+    int i;
+    if(arret == 1) {            // si train present
+        for(i=0;i<nbVoit;i++) {
+            if(voit[i].pos.x > 150 && voit[i].pos.x < 200) {
+                voit[i].etat = 1;
+            }
+        }
+    }
+    if(arret == 0) {
+        for(i=0;i<nbVoit;i++) {
+            voit[i].etat = 0;
+        }
+    }
+}
 
 
 int main(int argc, char *argv[])
@@ -88,20 +170,21 @@ int main(int argc, char *argv[])
 	SDL_Event event;
 	T_VOIT car[SIZE];
 	int continuer;
-
+	int res;
+	int arret=0;
 	// Variables du Timer
 	SDL_TimerID idTimer, idTimer2,idTimer3;			// code à améliorer : utiliser 1 seul timer
 	int periode = 10;
 
 	// initialisation
 	continuer = 1;
-	setParamVoiture(&car[0],2,0,230);		// premiere voiture plus rapide
-	setParamVoiture(&car[1],3,0,320);		// une deuxieme plus lente
-	setParamVoiture(&car[2],3,358,0);
+	setParamVoiture(&car[2],1,358,0,arret);
+	setParamVoiture(&car[0],2,0,230,arret);		// premiere voiture plus rapide
+    setParamVoiture(&car[1],3,0,320,arret);
 	affichageParamVoiture(car[0]);
 	affichageParamVoiture(car[1]);
 	affichageParamVoiture(car[2]);			// code à amélioreR
-
+    //SDL_RemoveTimer(idTimer)
 	// chargement de la map
 	tileset = SDL_LoadBMP("route.bmp");
 
@@ -128,9 +211,22 @@ int main(int argc, char *argv[])
 					break;
 			}
 		}
+        res=test(&car[2]);
+        if(res==1)
+        {
+        arret=1;
+        }
+        else
+        {
+        arret=0;
+        }
+        /*load(&car[0],arret);
+        load(&car[1],arret);*/
 		Afficher(ecran,tileset,table,LARGEUR_FENETRE/LARGEUR_TILE,HAUTEUR_FENETRE/HAUTEUR_TILE);
-		SDL_BlitSurface(imgSapin, NULL, ecran, &car[0].pos);			// code à améliorer
-		SDL_BlitSurface(imgSapin, NULL, ecran, &car[1].pos);
+		Afficher1(ecran,tileset,table,LARGEUR_FENETRE/LARGEUR_TILE,HAUTEUR_FENETRE/HAUTEUR_TILE,arret);
+        ControleArretVoitures(car,2,arret);
+        SDL_BlitSurface(imgSapin, NULL, ecran, &car[0].pos);
+        SDL_BlitSurface(imgSapin, NULL, ecran, &car[1].pos);
 		SDL_BlitSurface(imgtrain, NULL, ecran, &car[2].pos);
 		SDL_Flip(ecran);
 	}
